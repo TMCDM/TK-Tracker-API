@@ -139,7 +139,7 @@ const formatBoxes = async (boxes) => {
 
 const getOrderByOrderNumber = async (quoteNumber) => {
 
-
+	console.log("Recieved order", quoteNumber)
 
 
 	try {
