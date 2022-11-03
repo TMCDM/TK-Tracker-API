@@ -139,7 +139,7 @@ const formatBoxes = async (boxes) => {
 
 const getOrderByOrderNumber = async (quoteNumber) => {
 
-	console.log("Recieved order", quoteNumber)
+
 
 
 	try {
@@ -207,10 +207,14 @@ FROM ComputairQuotes.dbo.Box b
 
 		const quoteItems = quote.recordsets[0][0];
 
+		if (!quoteItems) {
+			return { error: "Record not found" }
+		}
 
-		return { ...quoteItems, boxes: boxList };
+
+		return { ...quoteItems, boxes: boxList, error: "" };
 	} catch (error) {
-		return {};
+		return { error: error.message };
 	}
 };
 

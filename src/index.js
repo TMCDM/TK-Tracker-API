@@ -19,8 +19,14 @@ app.post('/getOrder', express.json(), async (req, res) => {
 	const quoteNumber = req.body.quoteNumber;
 
 	const data = await getOrderByOrderNumber(quoteNumber).catch((error) =>
-		res.json({ err: 'Something went wrong' })
+		res.json({ error })
 	);
+
+
+	if (data.error) {
+		res.json({ error: data.error })
+	}
+
 
 	let final = {
 		customer: {
