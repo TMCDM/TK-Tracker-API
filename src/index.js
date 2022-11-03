@@ -24,7 +24,7 @@ app.post('/getOrder', express.json(), async (req, res) => {
 
 
 	if (data.error) {
-		res.json({ error: data.error })
+		return res.json({ error: data.error })
 	}
 
 
@@ -44,11 +44,11 @@ app.post('/getOrder', express.json(), async (req, res) => {
 		error: '',
 	};
 
-	res.json(final);
+	return res.json(final);
 });
 
 app.get('/__tmc_test__', (req, res) => {
-	res.json({ msg: 'OK' });
+	return res.json({ msg: 'OK' });
 });
 
 app.listen(3000, () => console.log('Listening on port 3000'));
