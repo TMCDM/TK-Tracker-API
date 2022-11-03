@@ -59,6 +59,10 @@ app.post("/getOrder", express.json(), async (req, res) => {
 	return res.json(final)
 })
 
+app.get("/__tmc_test__", (req, res) => {
+	res.json({ msg: "OK" })
+})
+
 
 
 
