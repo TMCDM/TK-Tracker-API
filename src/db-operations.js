@@ -9,8 +9,12 @@ const getRef = async (jobNumber) => {
 
 		let res = {};
 
+		console.log("REf", ref)
+
 		//check if there are records
 		const hasRef = Boolean(ref.recordsets[0].length);
+
+		console.log(hasRef)
 
 		//if there are no records skip the ref side of the items
 		if (!hasRef) {
@@ -29,7 +33,7 @@ const getRef = async (jobNumber) => {
 				(item) => item['Job#'].toLowerCase() !== 'in house'
 			)
 		) {
-			res.Refrigeration = {
+			res.refrigeration = {
 				name: 'Refigeration',
 				status: 'In Progress',
 				done: false,
@@ -69,7 +73,10 @@ const getCuttinBillStatus = (boxPD) => {
 
 const formatBoxes = async (boxes) => {
 	const boxFunc = async (box) => {
+
+		//check if the box has refridgeration
 		const refrigeration = await getRef(box.JobNumber);
+		//get the cutting bill status of the box
 		const cuttinBillStatus = getCuttinBillStatus(box.PD);
 
 		const getPanelStatus = () => {
@@ -147,6 +154,7 @@ const getOrderByOrderNumber = async (quoteNumber) => {
 		let pool = await sql.connect(boxAndQuoteDBConfig);
 
 		let quote = await pool.request().query`SELECT
+QuoteNumber,
 CstrName,
 CstrContact,
 CstrPostalAddress,
@@ -171,6 +179,14 @@ Consultant
 FROM Quotes q WHERE q.QuoteNumber = ${quoteNumber}`.then((quote) => {
 			return quote;
 		});
+
+		const quoteItems = quote.recordsets[0][0];
+
+		if (!quoteItems) {
+			return { error: "NO_RECORD_FOUND" }
+		}
+
+
 
 		let boxes = await pool.request().query`
 		SELECT 
@@ -203,14 +219,6 @@ FROM ComputairQuotes.dbo.Box b
 		WHERE b.QuoteNumber = ${quoteNumber}`;
 
 		const boxList = await formatBoxes(boxes.recordsets[0]);
-
-
-		const quoteItems = quote.recordsets[0][0];
-
-		if (!quoteItems) {
-			return { error: "Record not found" }
-		}
-
 
 		return { ...quoteItems, boxes: boxList, error: "" };
 	} catch (error) {
