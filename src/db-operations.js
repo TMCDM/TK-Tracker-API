@@ -1,4 +1,4 @@
-const { boxAndQuoteDBConfig } = require("./dbconfig")
+const { boxAndQuoteDBConfig } = require('./dbconfig');
 const sql = require('mssql');
 
 const getRef = async (jobNumber) => {
@@ -9,12 +9,12 @@ const getRef = async (jobNumber) => {
 
 		let res = {};
 
-		console.log("REf", ref)
+		console.log('REf', ref);
 
 		//check if there are records
 		const hasRef = Boolean(ref.recordsets[0].length);
 
-		console.log(hasRef)
+		console.log(hasRef);
 
 		//if there are no records skip the ref side of the items
 		if (!hasRef) {
@@ -73,7 +73,6 @@ const getCuttinBillStatus = (boxPD) => {
 
 const formatBoxes = async (boxes) => {
 	const boxFunc = async (box) => {
-
 		//check if the box has refridgeration
 		const refrigeration = await getRef(box.JobNumber);
 		//get the cutting bill status of the box
@@ -144,14 +143,29 @@ const formatBoxes = async (boxes) => {
 	return Promise.all(boxes.map((item) => boxFunc(item)));
 };
 
-const getOrderByOrderNumber = async (quoteNumber) => {
+const getOrderByJobNumber = async (orderNumber) => {
 
+	console.log("checking order number", orderNumber)
 
-
-
+	console.log("Making connection")
 	try {
-
 		let pool = await sql.connect(boxAndQuoteDBConfig);
+
+
+
+		const response = await pool.request().query`
+		SELECT b.QuoteNumber  from OmniJobData.JobData.JobStatuses js 
+		INNER JOIN Box b ON b.OrderNumber =  js.JobNumber 
+		WHERE js.JobNumber = ${orderNumber}`
+
+		const quoteNumber = response.recordsets[0][0].QuoteNumber
+
+		if (!quoteNumber) {
+			throw new Error("NO_RECORD_FOUND")
+		}
+
+		console.log("Found Quote Number", quoteNumber)
+
 
 		let quote = await pool.request().query`SELECT
 QuoteNumber,
@@ -163,7 +177,6 @@ CstrState,
 CstrZip,
 CstrTelephone,
 CstrCell,
-CstrFax,
 CstrEmail,
 ShpToCompany,
 ShpToContact,
@@ -173,7 +186,6 @@ ShpToCity,
 ShpToState,
 ShpToZip,
 ShpToTelephone,
-ShpToFax,
 ShpToEmail,
 Consultant
 FROM Quotes q WHERE q.QuoteNumber = ${quoteNumber}`.then((quote) => {
@@ -183,10 +195,8 @@ FROM Quotes q WHERE q.QuoteNumber = ${quoteNumber}`.then((quote) => {
 		const quoteItems = quote.recordsets[0][0];
 
 		if (!quoteItems) {
-			return { error: "NO_RECORD_FOUND" }
+			return { error: 'NO_RECORD_FOUND' };
 		}
-
-
 
 		let boxes = await pool.request().query`
 		SELECT 
@@ -220,13 +230,85 @@ FROM ComputairQuotes.dbo.Box b
 
 		const boxList = await formatBoxes(boxes.recordsets[0]);
 
-		return { ...quoteItems, boxes: boxList, error: "" };
+		return { ...quoteItems, boxes: boxList, error: '' };
+	} catch (error) {
+		return { error: error.message };
+	}
+};
+const getOrderByQuoteNumber = async (quoteNumber) => {
+	try {
+		let pool = await sql.connect(boxAndQuoteDBConfig);
+
+		let quote = await pool.request().query`SELECT
+QuoteNumber,
+CstrName,
+CstrContact,
+CstrPostalAddress,
+CstrCity,
+CstrState,
+CstrZip,
+CstrTelephone,
+CstrCell,
+CstrEmail,
+ShpToCompany,
+ShpToContact,
+ShpToAltContact,
+ShpToPostalAddress,
+ShpToCity,
+ShpToState,
+ShpToZip,
+ShpToTelephone,
+ShpToEmail,
+Consultant
+FROM Quotes q WHERE q.QuoteNumber = ${quoteNumber}`.then((quote) => {
+			return quote;
+		});
+
+		const quoteItems = quote.recordsets[0][0];
+
+		if (!quoteItems) {
+			return { error: 'NO_RECORD_FOUND' };
+		}
+
+		let boxes = await pool.request().query`
+		SELECT 
+b.CreationDate, b.QuoteNumber, b.BoxLetter, b.ItemNumber, b.Description,
+js.JobNumber,
+js.JobState,
+js.PD,
+js.Elec,
+js.CNC,
+js.Fram,
+js.CTL,
+js.WShr,
+js.WLay,
+js.WBrk,
+js.DShr,
+js.DLay,
+js.DBrk,
+js.Weld,
+js.Ref,
+js.WAsm,
+js.DAsm,
+js.DWir,
+js.DHng,
+js.Foam,
+js.Gask,
+js.Ship
+FROM ComputairQuotes.dbo.Box b
+		INNER JOIN OmniJobData.JobData.JobStatuses js
+		ON js.JobNumber = b.OrderNumber
+		WHERE b.QuoteNumber = ${quoteNumber}`;
+
+		const boxList = await formatBoxes(boxes.recordsets[0]);
+
+		return { ...quoteItems, boxes: boxList, error: '' };
 	} catch (error) {
 		return { error: error.message };
 	}
 };
 
-
 module.exports = {
-	getOrderByOrderNumber
-}
+	getOrderByJobNumber,
+	getOrderByQuoteNumber,
+};
