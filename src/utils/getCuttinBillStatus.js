@@ -1,24 +1,31 @@
 const getCuttingBillStatus = (box) => {
 	const boxPD = box.status.PD
+
 	let done = false;
 	let status = '';
 	let skip = false;
 
 	switch (boxPD) {
-		case (boxPD === 'G'):
+		case ('G'):
 			status = 'Complete';
-		case (boxPD === 'R'):
+			break;
+		case ('R'):
 			status = 'Not Started';
 			done = true;
-		case (boxPD === 'Y'):
+			break;
+		case ('Y'):
 			status = 'In Process';
 			done = true;
-		case (boxPD === 'S'):
+			break;
+		case ('S'):
 			status = 'N/A';
 			skip = true;
+			break;
 		default:
 			break;
 	}
+
+	console.log("BOXPD", { status, done, skip })
 
 	return { status, done, skip };
 };

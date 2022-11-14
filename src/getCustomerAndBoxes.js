@@ -103,8 +103,7 @@ WHERE b.QuoteNumber = (SELECT QuoteNumber FROM  Box b  WHERE b.OrderNumber = ${o
 	//format the boxes for the UI component
 	const formattedBoxes = formatBoxes(boxesWithRef)
 
-	console.clear()
-	console.log("Final boxes", formattedBoxes)
+
 
 	return { customer: customer, boxes: formattedBoxes };
 };

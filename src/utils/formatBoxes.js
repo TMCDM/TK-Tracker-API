@@ -31,10 +31,15 @@ const formatBoxes = (boxes) => {
 				manufactuerPanels: panelStatus,
 				qualityInspection: {
 					name: 'Quality Inpspection',
+					//if the status is shipped that means it went through qa so move to shipped beloew
 					status:
-						box.status.jobState.toLowerCase() !== 'shipped'
-							? 'In Progress'
-							: 'Complete',
+						box.status.jobState.toLowerCase() === 'shipped'
+							? 'Complete'
+							: 'In Progress',
+					done: box.status.jobState.toLowerCase() === 'shipped'
+						? false
+						: true,
+
 				},
 				shipped: {
 					name: 'Shipped',

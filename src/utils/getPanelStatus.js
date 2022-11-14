@@ -1,17 +1,16 @@
 const getPanelStatus = (box) => {
 	const manufactuerPanelsStarted =
-		box.status.CLT !== 0 && box.status.DShr !== 0 ? 'Complete' : 'In Progress';
+		box.status.CLT !== 0 && box.status.DShr !== 0 ? true : false;
 	const manufactuerPanelsComplete =
-		box.status.DHng !== 0 && box.status.Gask !== 0 ? 'Complete' : 'In Progress';
+		box.status.DHng !== 0 && box.status.Gask !== 0 ? true : false;
 	return {
 		name: 'Manufacturers Panels',
-		status:
-			manufactuerPanelsStarted && manufactuerPanelsComplete === 'Complete'
-				? 'Complete'
-				: 'In Progress',
+		status: manufactuerPanelsStarted && manufactuerPanelsComplete ? 'Complete' : 'In Progress',
+		done: manufactuerPanelsStarted && manufactuerPanelsComplete ? false : true,
+		skip: false,
 	};
 };
 
 module.exports = {
-	getPanelStatus
-}
+	getPanelStatus,
+};
