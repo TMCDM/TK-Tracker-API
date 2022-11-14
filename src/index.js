@@ -1,11 +1,16 @@
 require('dotenv').config();
-
-const { getOrderByJobNumber, getOrderByQuoteNumber } = require('./db-operations');
 const cors = require('cors');
 const morgan = require('morgan');
 const express = require('express');
 
+const { getOrderByJobNumber } = require('./db-operations');
+
+
+// Setup express
 const app = express();
+//use cords
+//TODO lockdown cors to domain only
+//TODO add rate limiting
 app.use(cors());
 
 // Set up logging
@@ -17,68 +22,25 @@ if (app.get('env') == 'production') {
 
 app.post('/getOrderByJobNumber', express.json(), async (req, res) => {
 	const jobNumber = req.body.jobNumber;
-
 	if (!jobNumber) {
-		return res.json({ error: "INVALID_INPUT" })
+		return res.json({ error: 'INVALID_INPUT' });
 	}
 
+	//get the customer and their boxes
+	const data = await getOrderByJobNumber(jobNumber).catch((err) => {
+		res.json(err);
+	});
 
-	const data = await getOrderByJobNumber(jobNumber).catch(err => {
-		res.json(err)
-	})
-
+	//
 
 	let final = {
-		customer: {
-			name: data.CstrName,
-			contact: data.CstrContact,
-			address: data.CstrPostalAddress,
-			city: data.CstrCity,
-			state: data.CstrState,
-			zip: data.CstrZip,
-			telephone: data.CstrTelephone,
-			cell: data.CstrCell,
-			email: data.CstrEmail,
-		},
+		customer: data.customer,
 		boxes: data.boxes,
 		error: '',
 	};
 
 	return res.json(final);
 });
-
-app.post('/orderByQuoteNumber', express.json(), async (req, res) => {
-	const quoteNumber = req.body.quoteNumber;
-
-	const data = await getOrderByQuoteNumber(quoteNumber).catch((error) =>
-		res.json({ error })
-	);
-
-
-	if (data.error) {
-		return res.json({ error: data.error })
-	}
-
-
-	let final = {
-		customer: {
-			name: data.CstrName,
-			contact: data.CstrContact,
-			address: data.CstrPostalAddress,
-			city: data.CstrCity,
-			state: data.CstrState,
-			zip: data.CstrZip,
-			telephone: data.CstrTelephone,
-			cell: data.CstrCell,
-			email: data.CstrEmail,
-		},
-		boxes: data.boxes,
-		error: '',
-	};
-
-	return res.json(final);
-});
-
 
 app.get('/__tmc_test__', (req, res) => {
 	return res.json({ msg: 'OK' });
