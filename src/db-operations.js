@@ -2,7 +2,7 @@ const { boxAndQuoteDBConfig } = require('./dbconfig');
 const sql = require('mssql');
 const { getCustomerAndBoxes } = require("./getCustomerAndBoxes")
 
-const { formatBoxes } = require("./stepHelpers/formatBoxes")
+
 
 const getOrderByJobNumber = async (JobNumber) => {
 
@@ -13,6 +13,7 @@ const getOrderByJobNumber = async (JobNumber) => {
 		const { customer, boxes } = await getCustomerAndBoxes(JobNumber, pool).catch(err => {
 			console.log(err)
 		})
+
 
 
 

@@ -1,4 +1,5 @@
 const { unflatten } = require('./utils/unflat');
+const { formatBoxes } = require("./utils/formatBoxes")
 
 const getRefrigeration = async (box, pool) => {
 	try {
@@ -99,8 +100,13 @@ WHERE b.QuoteNumber = (SELECT QuoteNumber FROM  Box b  WHERE b.OrderNumber = ${o
 	const boxesWithRef = await Promise.all(boxes.map(async (box) => await getRefrigeration(box, pool)))
 
 
+	//format the boxes for the UI component
+	const formattedBoxes = formatBoxes(boxesWithRef)
 
-	return { customer: customer, boxes: boxesWithRef };
+	console.clear()
+	console.log("Final boxes", formattedBoxes)
+
+	return { customer: customer, boxes: formattedBoxes };
 };
 
 module.exports = {

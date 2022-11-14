@@ -1,19 +1,19 @@
-const getCuttinBillStatus = (box) => {
-	const boxPD = box.PD
+const getCuttingBillStatus = (box) => {
+	const boxPD = box.status.PD
 	let done = false;
 	let status = '';
 	let skip = false;
 
 	switch (boxPD) {
-		case (boxPD = 'G'):
+		case (boxPD === 'G'):
 			status = 'Complete';
-		case (boxPD = 'R'):
+		case (boxPD === 'R'):
 			status = 'Not Started';
 			done = true;
-		case (boxPD = 'Y'):
+		case (boxPD === 'Y'):
 			status = 'In Process';
 			done = true;
-		case (boxPD = 'S'):
+		case (boxPD === 'S'):
 			status = 'N/A';
 			skip = true;
 		default:
@@ -25,5 +25,5 @@ const getCuttinBillStatus = (box) => {
 
 
 module.exports = {
-	getCuttinBillStatus
+	getCuttingBillStatus
 }

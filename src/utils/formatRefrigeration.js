@@ -1,4 +1,6 @@
-const formatRefrigeration = async (box) => {
+const formatRefrigeration = (box) => {
+
+	let res = {}
 	try {
 		//if there are no records skip the ref side of the items
 		if (!box.hasRef) {
@@ -22,7 +24,7 @@ const formatRefrigeration = async (box) => {
 
 		return res;
 	} catch (error) {
-		throw new Error('REF ERROR');
+		throw new Error(error);
 	}
 };
 
