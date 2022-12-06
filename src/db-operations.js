@@ -1,44 +1,29 @@
-const { boxAndQuoteDBConfig } = require('./dbconfig');
-const sql = require('mssql');
-const { getCustomerAndBoxes } = require("./getCustomerAndBoxes")
-
-
+const { boxAndQuoteDBConfig } = require('./dbconfig')
+const sql = require('mssql')
+const { getCustomerAndBoxes } = require('./getCustomerAndBoxes')
+const { formatBoxes } = require('./utils/formatBoxes')
+const { errorLogger } = require('./utils/errorLogger')
 
 const getOrderByJobNumber = async (JobNumber) => {
+    try {
+        let pool = await sql.connect(boxAndQuoteDBConfig)
 
-	try {
-		let pool = await sql.connect(boxAndQuoteDBConfig);
+        const { customer, boxes } = await getCustomerAndBoxes(JobNumber, pool)
 
-
-		const { customer, boxes } = await getCustomerAndBoxes(JobNumber, pool).catch(err => {
-			console.log(err)
-		})
-
-
-
-
-
-
-		// const formatedBoxes = await formatBoxes(boxes, pool)
-
-
-		return {
-			customer,
-			boxes: boxes
-		}
-
-
-
-
-	} catch (error) {
-		return { error: error.message };
-	}
-};
+        return {
+            customer,
+            boxes: boxes,
+        }
+    } catch (error) {
+        errorLogger(error)
+        return { error: error.message }
+    }
+}
 const getOrderByQuoteNumber = async (quoteNumber) => {
-	try {
-		let pool = await sql.connect(boxAndQuoteDBConfig);
+    try {
+        let pool = await sql.connect(boxAndQuoteDBConfig)
 
-		let quote = await pool.request().query`SELECT
+        let quote = await pool.request().query`SELECT
 QuoteNumber,
 CstrName,
 CstrContact,
@@ -60,17 +45,17 @@ ShpToTelephone,
 ShpToEmail,
 Consultant
 FROM Quotes q WHERE q.QuoteNumber = ${quoteNumber}`.then((quote) => {
-			return quote;
-		});
+            return quote
+        })
 
-		const quoteItems = quote.recordsets[0][0];
+        const quoteItems = quote.recordsets[0][0]
 
-		if (!quoteItems) {
-			return { error: 'NO_RECORD_FOUND' };
-		}
+        if (!quoteItems) {
+            return { error: 'NO_RECORD_FOUND' }
+        }
 
-		let boxes = await pool.request().query`
-		SELECT 
+        let boxes = await pool.request().query`
+		SELECT
 b.CreationDate, b.QuoteNumber, b.BoxLetter, b.ItemNumber, b.Description,
 js.JobNumber,
 js.JobState,
@@ -97,17 +82,17 @@ js.Ship
 FROM ComputairQuotes.dbo.Box b
 		INNER JOIN OmniJobData.JobData.JobStatuses js
 		ON js.JobNumber = b.OrderNumber
-		WHERE b.QuoteNumber = ${quoteNumber}`;
+		WHERE b.QuoteNumber = ${quoteNumber}`
 
-		const boxList = await formatBoxes(boxes.recordsets[0]);
+        const boxList = await formatBoxes(boxes.recordsets[0])
 
-		return { ...quoteItems, boxes: boxList, error: '' };
-	} catch (error) {
-		return { error: error.message };
-	}
-};
+        return { ...quoteItems, boxes: boxList, error: '' }
+    } catch (error) {
+        return { error: error.message }
+    }
+}
 
 module.exports = {
-	getOrderByJobNumber,
-	getOrderByQuoteNumber,
-};
+    getOrderByJobNumber,
+    getOrderByQuoteNumber,
+}

@@ -1,36 +1,33 @@
 const getCuttingBillStatus = (box) => {
-	const boxPD = box.status.PD
+    const boxPD = box.status.PD
 
-	let done = false;
-	let status = '';
-	let skip = false;
+    let done = false
+    let status = ''
+    let skip = false
 
-	switch (boxPD) {
-		case ('G'):
-			status = 'Complete';
-			break;
-		case ('R'):
-			status = 'Not Started';
-			done = true;
-			break;
-		case ('Y'):
-			status = 'In Process';
-			done = true;
-			break;
-		case ('S'):
-			status = 'N/A';
-			skip = true;
-			break;
-		default:
-			break;
-	}
+    switch (boxPD) {
+        case 'G':
+            status = 'Complete'
+            break
+        case 'R':
+            status = 'Not Started'
+            done = true
+            break
+        case 'Y':
+            status = 'In Process'
+            done = true
+            break
+        case 'S':
+            status = 'N/A'
+            skip = true
+            break
+        default:
+            break
+    }
 
-	console.log("BOXPD", { status, done, skip })
-
-	return { status, done, skip };
-};
-
+    return { status, done, skip }
+}
 
 module.exports = {
-	getCuttingBillStatus
+    getCuttingBillStatus,
 }
