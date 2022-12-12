@@ -4,7 +4,7 @@ const formatRefrigeration = (box) => {
 		//if there are NO records skip the ref side of the items
 		if (!box.hasRef) {
 			res.Refrigeration = {
-				name: 'Refigeration',
+				name: 'Refrigeration',
 				status: 'Complete',
 				done: false,
 				skip: true,
@@ -12,7 +12,7 @@ const formatRefrigeration = (box) => {
 			//if there are records but the state is NOT "In House"
 		} else if (box.hasRef && !box.refInHouse) {
 			res.refrigeration = {
-				name: 'Refigeration',
+				name: 'Refrigeration',
 				status: 'In Progress',
 				done: false,
 				skip: false,
@@ -20,7 +20,7 @@ const formatRefrigeration = (box) => {
 			//if there are records AND the state is not "In House"
 		} else if (box.hasRef && box.refInHouse) {
 			res.refrigeration = {
-				name: 'Refigeration',
+				name: 'Refrigeration',
 				status: 'Complete',
 				done: false,
 				skip: false,
