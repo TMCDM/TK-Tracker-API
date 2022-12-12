@@ -15,9 +15,9 @@ const getRefrigeration = async (box, pool) => {
 			box.refInHouse = null
 		} else {
 			//there is ref on the order
-
 			box.hasRef = Boolean(data.length)
-			box.refInHouse = data.some(
+			box.refInHouse = data.every(
+				// For some reason adding trim here is important
 				(item) => item['Job#'].toLowerCase().trim() === "in house"
 			)
 		}
