@@ -3,7 +3,7 @@ const formatRefrigeration = (box) => {
 	try {
 		//if there are NO records skip the ref side of the items
 		if (!box.hasRef) {
-			res.Refrigeration = {
+			res.refrigeration = {
 				name: 'Refrigeration',
 				status: 'Complete',
 				done: false,
