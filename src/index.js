@@ -33,12 +33,6 @@ app.post('/getOrderByJobNumber', express.json(), async (req, res) => {
 		res.json(err)
 	})
 
-
-
-
-
-
-
 	let final = {
 		customer: data.customer,
 		boxes: data.boxes,
